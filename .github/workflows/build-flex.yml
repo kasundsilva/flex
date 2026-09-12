@@ -1,0 +1,111 @@
+name: Build & Release Flex
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Check daily at 3 AM UTC
+  workflow_dispatch:     # Allows manual trigger anytime from Actions tab
+    inputs:
+      force_build:
+        description: 'Force build even if tag already exists'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch latest upstream release tag
+        id: upstream
+        run: |
+          UPSTREAM_TAG=$(curl -s https://api.github.com/repos/damontecres/Wholphin/releases/latest | jq -r .tag_name)
+          if [ -z "$UPSTREAM_TAG" ] || [ "$UPSTREAM_TAG" = "null" ]; then
+            echo "Failed to fetch upstream tag" >&2
+            exit 1
+          fi
+          echo "tag=$UPSTREAM_TAG" >> $GITHUB_OUTPUT
+          echo "Latest upstream tag: $UPSTREAM_TAG"
+
+      - name: Fetch latest fork release tag
+        id: my_release
+        run: |
+          MY_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/releases/latest | jq -r .tag_name // "none")
+          echo "tag=$MY_TAG" >> $GITHUB_OUTPUT
+          echo "Current fork release: $MY_TAG"
+
+      - name: Determine if build is required
+        id: should_build
+        run: |
+          FORCE="${{ inputs.force_build }}"
+          UPSTREAM_TAG="${{ steps.upstream.outputs.tag }}"
+          MY_TAG="${{ steps.my_release.outputs.tag }}"
+
+          if [ "$FORCE" = "true" ] || [ "$UPSTREAM_TAG" != "$MY_TAG" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+            echo "Triggering build for $UPSTREAM_TAG"
+          else
+            echo "build=false" >> $GITHUB_OUTPUT
+            echo "Fork is already up to date with $UPSTREAM_TAG. Skipping build."
+          fi
+
+      - name: Checkout repository
+        if: steps.should_build.outputs.build == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history needed for Gradle git describe / version tags
+
+      - name: Apply Flex Branding
+        if: steps.should_build.outputs.build == 'true'
+        run: |
+          chmod +x .branding/apply_branding.sh
+          .branding/apply_branding.sh "com.kasundsilva.flex"
+
+      - name: Setup JDK 21
+        if: steps.should_build.outputs.build == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Build Default Release APK
+        if: steps.should_build.outputs.build == 'true'
+        run: |
+          ./gradlew clean assembleDefaultRelease
+
+      - name: Sign APK
+        if: steps.should_build.outputs.build == 'true'
+        uses: r0adkll/sign-android-release@v1
+        id: sign_app
+        with:
+          releaseDirectory: app/build/outputs/apk/default/release
+          signingKey: ${{ secrets.KEYSTORE_BASE64 }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyAlias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Rename Signed APK
+        if: steps.should_build.outputs.build == 'true'
+        run: |
+          ORIG_FILE="${{ steps.sign_app.outputs.signedReleaseFile }}"
+          NEW_FILE="app/build/outputs/apk/default/release/Flex-${{ steps.upstream.outputs.tag }}.apk"
+          cp "$ORIG_FILE" "$NEW_FILE"
+          echo "RELEASE_APK=$NEW_FILE" >> $GITHUB_ENV
+
+      - name: Publish GitHub Release
+        if: steps.should_build.outputs.build == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.upstream.outputs.tag }}
+          name: "Flex ${{ steps.upstream.outputs.tag }}"
+          body: |
+            Automated rebranded release of upstream [Wholphin ${{ steps.upstream.outputs.tag }}](https://github.com/damontecres/Wholphin/releases/tag/${{ steps.upstream.outputs.tag }}).
+            
+            ### Installation on Google TV:
+            - Download `Flex-${{ steps.upstream.outputs.tag }}.apk` and sideload it to your Google TV using **Send Files to TV** or the **Downloader** app.
+            - Or add `https://github.com/${{ github.repository }}` to **Obtainium** for automatic in-place updates.
+          files: ${{ env.RELEASE_APK }}
