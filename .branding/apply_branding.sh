@@ -35,4 +35,8 @@ done
 sed -i.bak "s|applicationId = \"com.github.damontecres.wholphin\"|applicationId = \"$NEW_APP_ID\"|g" "$ROOT_DIR/app/build.gradle.kts"
 rm -f "$ROOT_DIR/app/build.gradle.kts.bak"
 
+# 6. Make Base64 keystore decoding lenient to newlines and whitespace
+sed -i.bak "s|Base64\.getDecoder()|Base64\.getMimeDecoder()|g" "$ROOT_DIR/app/build.gradle.kts"
+rm -f "$ROOT_DIR/app/build.gradle.kts.bak"
+
 echo "==> Branding applied successfully!"

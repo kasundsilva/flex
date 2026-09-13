@@ -86,7 +86,7 @@ configure<ApplicationExtension> {
         if (shouldSign.get()) {
             create("ci") {
                 file("ci.keystore").writeBytes(
-                    Base64.getDecoder().decode(System.getenv("SIGNING_KEY")),
+                    Base64.getMimeDecoder().decode(System.getenv("SIGNING_KEY")),
                 )
                 keyAlias = System.getenv("KEY_ALIAS")
                 keyPassword = System.getenv("KEY_PASSWORD")

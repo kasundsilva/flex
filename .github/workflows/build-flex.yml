@@ -80,9 +80,10 @@ jobs:
           KEY_ALIAS: "${{ secrets.KEY_ALIAS }}"
           KEY_PASSWORD: "${{ secrets.KEY_PASSWORD }}"
           KEY_STORE_PASSWORD: "${{ secrets.KEY_STORE_PASSWORD }}"
-          SIGNING_KEY: "${{ secrets.KEYSTORE_BASE64 }}"
           GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx12g -XX:MaxMetaspaceSize=1024m'"
         run: |
+          SIGNING_KEY=$(echo "${{ secrets.KEYSTORE_BASE64 }}" | tr -d '\r\n[:space:]')
+          export SIGNING_KEY
           ./gradlew clean assembleDefaultRelease
 
       - name: Prepare Release APK
