@@ -44,9 +44,17 @@ fun FlexSplash(modifier: Modifier = Modifier) {
             Text(
                 text = "FLEX",
                 color = Color.White,
-                fontSize = 28.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 4.sp,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = "Stream Like a King",
+                color = Color(0xFFC084FC),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 2.sp,
             )
             Spacer(modifier = Modifier.height(24.dp))
             CircularProgressIndicator(

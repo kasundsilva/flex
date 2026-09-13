@@ -3,6 +3,7 @@
 </p>
 
 <h1 align="center">Flex — An OSS Android TV Client for Jellyfin</h1>
+<p align="center"><strong><em>Stream Like a King</em></strong></p>
 
 <p align="center">
   <a href="https://github.com/kasundsilva/flex/releases/latest">

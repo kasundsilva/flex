@@ -542,12 +542,21 @@ fun NavDrawer(
                                     modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
                                     contentAlignment = Alignment.Center,
                                 ) {
-                                    Text(
-                                        text = "Developed by kp",
-                                        color = Color(0xFF757575),
-                                        fontSize = 11.sp,
-                                        textAlign = TextAlign.Center,
-                                    )
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            text = "Stream Like a King",
+                                            color = Color(0xFFC084FC),
+                                            fontSize = 11.sp,
+                                            textAlign = TextAlign.Center,
+                                        )
+                                        Text(
+                                            text = "Developed by kp",
+                                            color = Color(0xFF757575),
+                                            fontSize = 10.sp,
+                                            textAlign = TextAlign.Center,
+                                            modifier = Modifier.padding(top = 2.dp),
+                                        )
+                                    }
                                 }
                             }
                         }
