@@ -57,6 +57,7 @@ import com.github.damontecres.wholphin.services.tvprovider.TvProviderSchedulerSe
 import com.github.damontecres.wholphin.ui.CoilConfig
 import com.github.damontecres.wholphin.ui.LocalImageUrlService
 import com.github.damontecres.wholphin.ui.collectLatestIn
+import com.github.damontecres.wholphin.ui.components.FlexSplash
 import com.github.damontecres.wholphin.ui.components.LoadingPage
 import com.github.damontecres.wholphin.ui.launchDefault
 import com.github.damontecres.wholphin.ui.nav.Destination
@@ -242,14 +243,7 @@ class MainActivity : AppCompatActivity() {
                             showLoading = true
                         }
                         if (showLoading) {
-                            Box(
-                                modifier =
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(Color.Black),
-                            ) {
-                                LoadingPage()
-                            }
+                            FlexSplash()
                         }
                     } else {
                         userPreferences?.let { userPreferences ->

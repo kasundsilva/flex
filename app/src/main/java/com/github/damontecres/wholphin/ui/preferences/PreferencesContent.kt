@@ -305,7 +305,7 @@ fun PreferencesContent(
                                         onLongClick = {
                                             viewModel.navigationManager.navigateTo(Destination.Debug)
                                         },
-                                        summary = installedVersion.toString(),
+                                        summary = "$installedVersion • Developed by kp",
                                         interactionSource = interactionSource,
                                         modifier = focusModifier,
                                     )

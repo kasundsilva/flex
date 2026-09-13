@@ -34,6 +34,7 @@ import com.github.damontecres.wholphin.services.NavigationManager
 import com.github.damontecres.wholphin.services.ScreensaverService
 import com.github.damontecres.wholphin.services.SetupDestination
 import com.github.damontecres.wholphin.ui.components.AppScreensaver
+import com.github.damontecres.wholphin.ui.components.FlexSplash
 import com.github.damontecres.wholphin.ui.nav.ApplicationContent
 import com.github.damontecres.wholphin.ui.setup.SwitchServerContent
 import com.github.damontecres.wholphin.ui.setup.SwitchUserContent
@@ -74,15 +75,7 @@ fun MainContent(
                     NavEntry(key) {
                         when (key) {
                             SetupDestination.Loading -> {
-                                Box(
-                                    modifier = Modifier.size(200.dp),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    CircularProgressIndicator(
-                                        color = MaterialTheme.colorScheme.border,
-                                        modifier = Modifier.align(Alignment.Center),
-                                    )
-                                }
+                                FlexSplash()
                             }
 
                             SetupDestination.ServerList -> {
