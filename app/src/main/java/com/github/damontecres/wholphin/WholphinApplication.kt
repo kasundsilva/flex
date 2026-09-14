@@ -97,9 +97,9 @@ class WholphinApplication :
                 )
             dialog {
                 text =
-                    "Wholphin has crashed! Would you like to attempt to " +
+                    "Flex has crashed! Would you like to attempt to " +
                     "send a crash report to your Jellyfin server?"
-                title = "Wholphin Crash Report"
+                title = "Flex Crash Report"
                 positiveButtonText = "Send"
                 negativeButtonText = "Do not send"
             }

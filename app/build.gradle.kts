@@ -48,6 +48,13 @@ val gitTags =
         .standardOutput.asText
         .get()
 
+val gitCommitCount =
+    providers
+        .exec { commandLine("git", "rev-list", "--count", "HEAD") }
+        .standardOutput.asText
+        .map { it.trim().toIntOrNull() ?: 0 }
+        .getOrElse(0)
+
 val gitDescribe =
     providers
         .exec { commandLine("git", "describe", "--tags", "--long", "--match=v*") }
@@ -75,7 +82,7 @@ configure<ApplicationExtension> {
         applicationId = "com.github.damontecres.wholphin"
         minSdk = libs.versions.minSdk.getInt()
         targetSdk = libs.versions.targetSdk.getInt()
-        versionCode = gitTags.trim().lines().size
+        versionCode = (gitTags.trim().lines().size * 10000) + gitCommitCount
         versionName = gitDescribe.trim().removePrefix("v").ifBlank { "0.0.0" }
         testInstrumentationRunner = "com.github.damontecres.wholphin.test.WholphinTestRunner"
 

@@ -36,7 +36,7 @@ fun FlexSplash(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.Center,
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.ic_launcher),
+                painter = painterResource(id = R.drawable.flex_logo),
                 contentDescription = "Flex Logo",
                 modifier = Modifier.size(130.dp),
             )

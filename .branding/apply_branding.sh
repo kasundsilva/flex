@@ -33,12 +33,20 @@ for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
   fi
 done
 
-# 5. Update Application ID in build.gradle.kts
+# 5. Copy splash logo
+cp "$BRANDING_DIR/icons/flex_logo.png" "$ROOT_DIR/app/src/main/res/drawable/flex_logo.png"
+
+# 6. Update Application ID in build.gradle.kts
 sed -i.bak "s|applicationId = \"com.github.damontecres.wholphin\"|applicationId = \"$NEW_APP_ID\"|g" "$ROOT_DIR/app/build.gradle.kts"
 rm -f "$ROOT_DIR/app/build.gradle.kts.bak"
 
-# 6. Make Base64 keystore decoding lenient to newlines and whitespace
+# 7. Make Base64 keystore decoding lenient to newlines and whitespace
 sed -i.bak "s|Base64\.getDecoder()|Base64\.getMimeDecoder()|g" "$ROOT_DIR/app/build.gradle.kts"
 rm -f "$ROOT_DIR/app/build.gradle.kts.bak"
+
+# 8. Rebrand crash dialog in WholphinApplication.kt
+sed -i.bak "s|Wholphin has crashed!|Flex has crashed!|g" "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/WholphinApplication.kt"
+sed -i.bak "s|Wholphin Crash Report|Flex Crash Report|g" "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/WholphinApplication.kt"
+rm -f "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/WholphinApplication.kt.bak"
 
 echo "==> Branding applied successfully!"
