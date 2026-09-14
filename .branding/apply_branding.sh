@@ -14,9 +14,11 @@ sed -i.bak "s|<string name=\"app_name\" translatable=\"false\">.*</string>|<stri
 sed -i.bak "s|<string name=\"app_name_long\" translatable=\"false\">.*</string>|<string name=\"app_name_long\" translatable=\"false\">$APP_NAME</string>|g" "$ROOT_DIR/app/src/main/res/values/strings.xml"
 rm -f "$ROOT_DIR/app/src/main/res/values/strings.xml.bak"
 
-# 2. Update banner background color to OLED black
+# 2. Update banner and launcher background color to OLED black
 sed -i.bak "s|#000B25|#000000|g" "$ROOT_DIR/app/src/main/res/values/ic_banner_background.xml"
 rm -f "$ROOT_DIR/app/src/main/res/values/ic_banner_background.xml.bak"
+sed -i.bak "s|#101010|#000000|g" "$ROOT_DIR/app/src/main/res/values/ic_launcher_background.xml"
+rm -f "$ROOT_DIR/app/src/main/res/values/ic_launcher_background.xml.bak"
 
 # 3. Copy TV Banners
 cp "$BRANDING_DIR/banners/ic_banner.png" "$ROOT_DIR/app/src/main/res/mipmap-xhdpi/ic_banner.png"
