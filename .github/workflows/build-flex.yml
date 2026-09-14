@@ -1,6 +1,12 @@
 name: Build & Release Flex
 
 on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
   schedule:
     - cron: '0 3 * * *' # Check daily at 3 AM UTC
   workflow_dispatch:     # Allows manual trigger anytime from Actions tab
@@ -40,13 +46,14 @@ jobs:
       - name: Determine if build is required
         id: should_build
         run: |
+          EVENT="${{ github.event_name }}"
           FORCE="${{ inputs.force_build }}"
           UPSTREAM_TAG="${{ steps.upstream.outputs.tag }}"
           MY_TAG="${{ steps.my_release.outputs.tag }}"
 
-          if [ "$FORCE" = "true" ] || [ "$UPSTREAM_TAG" != "$MY_TAG" ]; then
+          if [ "$EVENT" = "push" ] || [ "$FORCE" = "true" ] || [ "$UPSTREAM_TAG" != "$MY_TAG" ]; then
             echo "build=true" >> $GITHUB_OUTPUT
-            echo "Triggering build for $UPSTREAM_TAG"
+            echo "Triggering build for $UPSTREAM_TAG (event: $EVENT)"
           else
             echo "build=false" >> $GITHUB_OUTPUT
             echo "Fork is already up to date with $UPSTREAM_TAG. Skipping build."
@@ -112,3 +119,4 @@ jobs:
             - Download `Flex-${{ steps.upstream.outputs.tag }}.apk` and sideload it to your Google TV using **Send Files to TV** or the **Downloader** app.
             - Or add `https://github.com/${{ github.repository }}` to **Obtainium** for automatic in-place updates.
           files: ${{ env.RELEASE_APK }}
+          make_latest: true
