@@ -233,18 +233,16 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MaterialTheme(colorScheme = PurpleThemeColors.darkScheme) {
                 Surface(Modifier.fillMaxSize()) {
+                    var splashFinished by remember { mutableStateOf(playExternalViewModel.launched.value) }
+                    LaunchedEffect(Unit) {
+                        if (!splashFinished) {
+                            delay(1800.milliseconds)
+                            splashFinished = true
+                        }
+                    }
                     val userPreferences by userPreferencesService.flow.collectAsState(null)
-                    if (userPreferences == null) {
-                        // Show loading page if it is taking a while to get app preferences
-                        var showLoading by remember { mutableStateOf(false) }
-                        LaunchedEffect(Unit) {
-                            delay(500.milliseconds)
-                            Timber.i("Showing loading page")
-                            showLoading = true
-                        }
-                        if (showLoading) {
-                            FlexSplash()
-                        }
+                    if (!splashFinished || userPreferences == null) {
+                        FlexSplash()
                     } else {
                         userPreferences?.let { userPreferences ->
                             val appPreferences = userPreferences.appPreferences

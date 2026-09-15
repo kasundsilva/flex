@@ -33,8 +33,13 @@ for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
   fi
 done
 
-# 5. Copy splash logo
+# 5. Copy splash logo and window background
 cp "$BRANDING_DIR/icons/flex_logo.png" "$ROOT_DIR/app/src/main/res/drawable/flex_logo.png"
+cp "$BRANDING_DIR/splash_background.xml" "$ROOT_DIR/app/src/main/res/drawable/splash_background.xml"
+if ! grep -q "android:windowBackground" "$ROOT_DIR/app/src/main/res/values/themes.xml"; then
+  sed -i.bak "s|</style>|    <item name=\"android:windowBackground\">@drawable/splash_background</item>\n    </style>|g" "$ROOT_DIR/app/src/main/res/values/themes.xml"
+  rm -f "$ROOT_DIR/app/src/main/res/values/themes.xml.bak"
+fi
 
 # 6. Update Application ID in build.gradle.kts
 sed -i.bak "s|applicationId = \"com.github.damontecres.wholphin\"|applicationId = \"$NEW_APP_ID\"|g" "$ROOT_DIR/app/build.gradle.kts"
