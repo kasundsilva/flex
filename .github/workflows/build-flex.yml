@@ -59,17 +59,36 @@ jobs:
             echo "Fork is already up to date with $UPSTREAM_TAG. Skipping build."
           fi
 
+          if [ "$UPSTREAM_TAG" != "$MY_TAG" ]; then
+            echo "is_new_upstream=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_new_upstream=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
         if: steps.should_build.outputs.build == 'true'
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Full history needed for Gradle git describe / version tags
 
-      - name: Fetch upstream tags
+      - name: Sync upstream changes
         if: steps.should_build.outputs.build == 'true'
         run: |
+          UPSTREAM_TAG="${{ steps.upstream.outputs.tag }}"
           git remote add upstream https://github.com/damontecres/Wholphin.git || true
           git fetch upstream --tags --force
+          git fetch upstream main
+          
+          if [ "${{ steps.should_build.outputs.is_new_upstream }}" = "true" ]; then
+            echo "New upstream release detected ($UPSTREAM_TAG). Merging upstream changes into main..."
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git merge --no-edit "$UPSTREAM_TAG" || {
+              echo "Merge conflict detected while merging upstream $UPSTREAM_TAG" >&2
+              exit 1
+            }
+            git push origin main || echo "Failed to push merge commit to main, proceeding with build"
+          fi
 
       - name: Apply Flex Branding
         if: steps.should_build.outputs.build == 'true'
