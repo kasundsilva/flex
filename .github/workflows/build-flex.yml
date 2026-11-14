@@ -27,7 +27,8 @@ jobs:
       - name: Fetch latest upstream release tag
         id: upstream
         run: |
-          UPSTREAM_TAG=$(curl -s https://api.github.com/repos/damontecres/Wholphin/releases/latest | jq -r '.tag_name')
+          UPSTREAM_TAG=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/damontecres/Wholphin/releases/latest | jq -r '.tag_name')
           if [ -z "$UPSTREAM_TAG" ] || [ "$UPSTREAM_TAG" = "null" ]; then
             echo "Failed to fetch upstream tag" >&2
             exit 1
