@@ -193,7 +193,14 @@ class AppPreferencesSerializer
 
         override suspend fun readFrom(input: InputStream): AppPreferences {
             try {
-                return AppPreferences.parseFrom(input)
+                val prefs = AppPreferences.parseFrom(input)
+                return if (prefs.updateUrl.isBlank() ||
+                    prefs.updateUrl.contains("damontecres/Wholphin", ignoreCase = true)
+                ) {
+                    prefs.toBuilder().setUpdateUrl(AppPreference.UpdateUrl.defaultValue).build()
+                } else {
+                    prefs
+                }
             } catch (exception: InvalidProtocolBufferException) {
                 throw CorruptionException("Cannot read proto.", exception)
             }

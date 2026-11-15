@@ -54,4 +54,11 @@ sed -i.bak "s|Wholphin has crashed!|Flex has crashed!|g" "$ROOT_DIR/app/src/main
 sed -i.bak "s|Wholphin Crash Report|Flex Crash Report|g" "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/WholphinApplication.kt"
 rm -f "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/WholphinApplication.kt.bak"
 
+# 9. Wire up built-in self-updater to kasundsilva/flex
+sed -i.bak "s|https://api.github.com/repos/damontecres/Wholphin/releases|https://api.github.com/repos/kasundsilva/flex/releases|g" "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/preferences/AppPreference.kt"
+rm -f "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/preferences/AppPreference.kt.bak"
+sed -i.bak "s|https://api.github.com/repos/damontecres/Wholphin/releases|https://api.github.com/repos/kasundsilva/flex/releases|g" "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/services/UpdateChecker.kt"
+sed -i.bak "s|const val ASSET_NAME = \"Wholphin\"|const val ASSET_NAME = \"Flex\"|g" "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/services/UpdateChecker.kt"
+rm -f "$ROOT_DIR/app/src/main/java/com/github/damontecres/wholphin/services/UpdateChecker.kt.bak"
+
 echo "==> Branding applied successfully!"

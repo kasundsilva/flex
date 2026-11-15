@@ -57,7 +57,7 @@ class UpdateChecker
         @param:StandardOkHttpClient private val okHttpClient: OkHttpClient,
     ) {
         companion object {
-            const val ASSET_NAME = "Wholphin"
+            const val ASSET_NAME = "Flex"
             const val APK_NAME = "$ASSET_NAME.apk"
 
             private const val APK_MIME_TYPE = "application/vnd.android.package-archive"
@@ -129,7 +129,7 @@ class UpdateChecker
 
         suspend fun getRelease(version: Version): Release? {
             val url =
-                "https://api.github.com/repos/damontecres/Wholphin/releases/tags/v${version.major}.${version.minor}.${version.patch}"
+                "https://api.github.com/repos/kasundsilva/flex/releases/tags/v${version.major}.${version.minor}.${version.patch}"
             return withContext(WholphinDispatchers.IO) {
                 val request =
                     Request
@@ -159,8 +159,14 @@ class UpdateChecker
             return okHttpClient.newCall(request).execute().use {
                 if (it.isSuccessful) {
                     val result = Json.parseToJsonElement(it.body.string())
-                    val name = result.jsonObject["name"]?.jsonPrimitive?.contentOrNull
-                    val version = Version.tryFromString(name)
+                    val rawName =
+                        result.jsonObject["name"]
+                            ?.jsonPrimitive
+                            ?.contentOrNull
+                            ?.removePrefix("Flex ")
+                            ?.trim()
+                    val tagName = result.jsonObject["tag_name"]?.jsonPrimitive?.contentOrNull
+                    val version = Version.tryFromString(rawName) ?: Version.tryFromString(tagName)
                     val publishedAt =
                         result.jsonObject["published_at"]?.jsonPrimitive?.contentOrNull
                     val body = result.jsonObject["body"]?.jsonPrimitive?.contentOrNull
@@ -410,13 +416,15 @@ fun getDownloadUrl(
     val releaseSuffix = if (debug) "-debug" else "-release"
     val preferredNames =
         buildList {
-            add("$ASSET_NAME${releaseSuffix}$abiSuffix.apk")
-            add("$ASSET_NAME$releaseSuffix.apk")
-            if (!debug) {
-                if (abiSuffix.isNotNullOrBlank()) {
-                    add("$ASSET_NAME$abiSuffix.apk")
+            for (prefix in listOf(ASSET_NAME, "Wholphin").distinct()) {
+                add("$prefix${releaseSuffix}$abiSuffix.apk")
+                add("$prefix$releaseSuffix.apk")
+                if (!debug) {
+                    if (abiSuffix.isNotNullOrBlank()) {
+                        add("$prefix$abiSuffix.apk")
+                    }
+                    add("$prefix.apk")
                 }
-                add("$ASSET_NAME.apk")
             }
         }
     var preferredAsset: JsonObject? = null
