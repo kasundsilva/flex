@@ -188,7 +188,7 @@ class UpdateChecker
                             }
                         return@use Release(version, downloadUrl, publishedAt, body, notes)
                     } else {
-                        Timber.w("Update version parsing failed. name=$name")
+                        Timber.w("Update version parsing failed. name=$rawName, tag=$tagName")
                     }
                 } else {
                     Timber.w("Update check failed ${it.code}: ${it.message}")
