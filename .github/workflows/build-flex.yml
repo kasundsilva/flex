@@ -80,15 +80,20 @@ jobs:
           git fetch upstream --tags --force
           git fetch upstream main
           
-          if [ "${{ steps.should_build.outputs.is_new_upstream }}" = "true" ]; then
-            echo "New upstream release detected ($UPSTREAM_TAG). Merging upstream changes into main..."
+          if ! git merge-base --is-ancestor "$UPSTREAM_TAG" HEAD; then
+            echo "Upstream tag $UPSTREAM_TAG is not yet merged into HEAD. Merging..."
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git merge --no-edit "$UPSTREAM_TAG" || {
               echo "Merge conflict detected while merging upstream $UPSTREAM_TAG" >&2
               exit 1
             }
-            git push origin main || echo "Failed to push merge commit to main, proceeding with build"
+            if ! git push origin HEAD:main; then
+              echo "Push failed (likely due to upstream workflow file changes); keeping fork .github/workflows and retrying push..."
+              git checkout HEAD~1 -- .github/workflows/
+              git commit --amend --no-edit
+              git push origin HEAD:main || echo "Failed to push merge commit to main, proceeding with build"
+            fi
           fi
 
       - name: Apply Flex Branding
